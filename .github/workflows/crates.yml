@@ -33,7 +33,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - name: push
-        run: |
-          "cargo publish -v --workspace --token ${{ secrets.CRATES_TOKEN }}"
+
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2.7.7
+        with:
+          env-vars: "CARGO RUST"
+          cache-on-failure: true
+
+      - name: Publish to crates.io
+        run: cargo publish -v --workspace --token ${{ secrets.CRATES_TOKEN }}
