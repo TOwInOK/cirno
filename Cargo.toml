@@ -1,0 +1,59 @@
+
+[workspace]
+members = ["example"]
+resolver = "2"
+
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+authors = ["TOwInOK <60252419+TOwInOK@users.noreply.github.com>"]
+repository = "change_me"
+license = "MIT"                                                   #"Apache-2.0"
+
+[workspace.dependencies]
+# serde = { version = "^1", features = ["derive"] }
+# serde_json = { version = "1" }
+# ron = "^0.10"
+# tracing = "^0.1"
+# tracing-subscriber = "^0.3"
+# anyhow = "^1"
+# tokio = { version = "^1", features = ["full"] }
+# thiserror = "^2"
+
+
+[profile.dev]
+opt-level = 0
+debug = true
+strip = "none"
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = 'unwind'
+incremental = true
+codegen-units = 256
+rpath = false
+
+[profile.release]
+opt-level = 'z'
+debug = false
+lto = true
+codegen-units = 24
+panic = 'abort'
+strip = true
+incremental = true
+debug-assertions = false
+overflow-checks = false
+
+[profile.test]
+opt-level = 0
+debug = true
+
+[profile.bench]
+opt-level = 3
+debug = false
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1

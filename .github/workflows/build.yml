@@ -1,0 +1,159 @@
+# Before usage
+# - Change name of output files
+# - Change lint command if needed
+
+name: Build and push
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  CARGO_TERM_COLOR: always
+  BINARY_NAME: change_me
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2.7.7
+        with:
+          env-vars: "CARGO RUST"
+          cache-on-failure: true
+
+      - name: test
+        run: cargo test --tests --bins --examples # instruct some packages if needed
+
+      - name: lint
+        run: cargo clippy # instruct some packages if needed
+
+  build-and-release:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+    needs: [lint]
+    strategy:
+      matrix:
+        include:
+          # linux x64
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: change_me
+            asset_name: change_me-linux-amd64
+
+          # linux arm
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact_name: change_me
+            asset_name: change_me-linux-arm
+
+          # windows x64
+          - os: windows-latest
+            target: x86_64-pc-windows-gnu
+            artifact_name: change_me.exe
+            asset_name: change_me-windows-amd64.exe
+
+          # windows arm
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            artifact_name: change_me.exe
+            asset_name: change_me-windows-arm.exe
+
+          # macos x64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: change_me
+            asset_name: change_me-macos-amd64
+
+          # macos arm
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: change_me
+            asset_name: change_me-macos-arm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+
+      - name: Add target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install Linux ARM dependencies
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Set linker for Linux ARM
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          echo '[target.aarch64-unknown-linux-gnu]' >> ~/.cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> ~/.cargo/config.toml
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v0-rust"
+          shared-key: "${{ matrix.target }}"
+          cache-on-failure: "true"
+          cache-all-crates: "true"
+          workspaces: |
+            . -> target
+          cache-targets: "true"
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp "target/${{ matrix.target }}/release/${{ matrix.artifact_name }}" "artifacts/${{ matrix.asset_name }}"
+          else
+            cp "target/${{ matrix.target }}/release/${{ matrix.artifact_name }}" "artifacts/${{ matrix.asset_name }}"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: artifacts/${{ matrix.asset_name }}
+
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            change_me-linux-amd64/change_me-linux-amd64
+            change_me-windows-amd64.exe/change_me-windows-amd64.exe
+            change_me-macos-amd64/change_me-macos-amd64
+            change_me-linux-arm/change_me-linux-arm
+            change_me-windows-arm.exe/change_me-windows-arm.exe
+            change_me-macos-arm/change_me-macos-arm
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          append_bode: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,10 @@
+
+[package]
+name = "example"
+version.workspace = true    # or version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
