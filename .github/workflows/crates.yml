@@ -1,9 +1,9 @@
-name: Lint
+name: Deploy to crates.io
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -27,3 +27,13 @@ jobs:
 
       - name: lint
         run: cargo clippy
+
+  create-release:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: push
+        run: |
+          "cargo publish -v --workspace --token ${{ secrets.CRATES_TOKEN }}"

@@ -1,24 +1,20 @@
 
 [workspace]
-members = ["example"]
+members = ["cirno", "cirno_store"]
 resolver = "2"
 
 [workspace.package]
-version = "0.0.1"
+version = "1.0.0"
 edition = "2024"
 authors = ["TOwInOK <60252419+TOwInOK@users.noreply.github.com>"]
-repository = "change_me"
-license = "MIT"                                                   #"Apache-2.0"
+repository = "https://github.com/TOwInOK/cirno"
+license = "MIT"
+description = "Motivational phrases in Japanese and Russian to brighten your day"
+keywords = ["motivation", "japanese", "russian", "phrases", "cli"]
+categories = ["command-line-utilities"]
+readme = "README.md"
 
 [workspace.dependencies]
-# serde = { version = "^1", features = ["derive"] }
-# serde_json = { version = "1" }
-# ron = "^0.10"
-# tracing = "^0.1"
-# tracing-subscriber = "^0.3"
-# anyhow = "^1"
-# tokio = { version = "^1", features = ["full"] }
-# thiserror = "^2"
 
 
 [profile.dev]

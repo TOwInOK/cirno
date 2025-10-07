@@ -1,0 +1,15 @@
+[package]
+name = "cirno_store"
+description = "A library containing motivational phrases in Japanese and Russian"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+keywords = ["motivation", "japanese", "russian", "phrases", "quotes"]
+categories = ["data-structures"]
+
+
+[dependencies]
+getrandom = "0.3"
+tinyrand = "0.5"

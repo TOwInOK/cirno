@@ -1,0 +1,19 @@
+
+[package]
+name = "cirno"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+description = "A command-line application that displays random motivational phrases in Japanese and Russian to brighten your day"
+keywords = ["cli", "motivation", "japanese", "russian", "quotes"]
+categories = ["command-line-utilities"]
+readme = "../README.md"
+
+[dependencies]
+colored = "3.0"
+cirno_store = { path = "../cirno_store" }
+terminal_size = "0.4"
+unicode-width = "0.2"
+clap = { version = "4.5.48", features = ["derive"] }
