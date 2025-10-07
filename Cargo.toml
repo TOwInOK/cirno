@@ -15,7 +15,7 @@ categories = ["command-line-utilities"]
 readme = "README.md"
 
 [workspace.dependencies]
-
+cirno_store = { version = "1.0.0", path = "cirno_store" }
 
 [profile.dev]
 opt-level = 0

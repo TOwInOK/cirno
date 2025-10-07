@@ -12,8 +12,8 @@ categories = ["command-line-utilities"]
 readme = "../README.md"
 
 [dependencies]
+cirno_store.workspace = true
 colored = "3.0"
-cirno_store = { path = "../cirno_store" }
 terminal_size = "0.4"
 unicode-width = "0.2"
 clap = { version = "4.5.48", features = ["derive"] }
