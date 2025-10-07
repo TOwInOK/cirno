@@ -3,7 +3,7 @@ name: Deploy to crates.io
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "c*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
